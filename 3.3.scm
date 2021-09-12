@@ -1,0 +1,26 @@
+#lang racket
+(define (make-account balance secret-password)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Недостаточно денег на счете"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (define (dispatch m)
+    (cond ((eq? m 'withdraw) withdraw)
+          ((eq? m 'deposit) deposit)
+          (else (error "Неизвестный вызов -- MAKE-ACCOUNT"
+                       m))))
+  (define (deco-pass m pass)
+    (if (eq? pass secret-password)
+        (dispatch m)
+        (error "wrong password")))
+  deco-pass)
+
+
+(define k (make-account 100 'wtf))
+((k 'withdraw 'wtf) 5)
+((k 'deposit 'wtf) 10)
+((k 'deposit 'kfg) 3)
